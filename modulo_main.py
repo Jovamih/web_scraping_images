@@ -58,18 +58,25 @@ def web_scrapper(url_victima,path_dest="",filter=""):
         
         coincidence_img=soup.find_all("img") #devuelve todas  las coincidencias img (etiquetas que poseen imagenes)
         #print("{0} Imagenes detectadas.".format(len(coincidence_img)))
+        #filtramos aquellos que posean HREF
+        coincidence_img=[x for x in coincidence_img if x.has_attr("src")]
         list_resources=[]
         for tag_img in coincidence_img:
             image_relative=tag_img.get("src")
             
-            if image_relative is None:
+            if image_relative is None: #si SRC existe pero esta vacio SRC="#"
                 continue
-            if image_relative.endswith(".png") or image_relative.endswith(".jpg"):
-                image_absolute= image_relative if image_relative.startswith("https") else  dominio+image_relative
+            else:
+                image_absolute= image_relative if image_relative.startswith("http") or image_relative.startswith("https") else dominio+image_relative
+                im_name=image_absolute[image_absolute.rfind("/")+1:]
+                list_resources.append((im_name,image_absolute))
+
+            """if image_relative.endswith(".png") or image_relative.endswith(".jpg"):
+                image_absolute= image_relative if image_relative.startswith("https") or  else  dominio+image_relative
                 im_name=image_absolute[image_absolute.rfind("/")+1:]
                 list_resources.append((im_name,image_absolute))
                 #download_file(image_absolute,"{0}/{1}".format(path_dest,im_name))
-                #print("{0} guardado correctamente en {1}".format(im_name,path_dest))
+                #print("{0} guardado correctamente en {1}".format(im_name,path_dest))"""
         return list_resources
     
     return []

@@ -6,9 +6,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 from msedge.selenium_tools import EdgeOptions,Edge
+#firefox para compatibilidad con streamlit
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
+
 from modulo_main import parse_link
 
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
+#para compatibilidad con streamlit
+from webdriver_manager.firefox import GeckoDriverManager
 
 
 
@@ -17,14 +23,18 @@ class ScrapperBot(object):
     def __init__(self, url):
 
         self.url=url
-        #agregamos las opciones
-        options=EdgeOptions()
-        options.use_chromium=True
+        #agregamos las opciones de edge
+        #options=EdgeOptions()
+        #options.use_chromium=True
+        #agregamos las opciones de firefox
+        options=Options() #para firefox
+
         options.add_argument("--headless")
         options.add_argument("--log-level=3")
-        #creamos el driver
-        self.driver = Edge(executable_path=EdgeChromiumDriverManager().install(),options=options)
-
+        #creamos el driver para edge
+        #self.driver = Edge(executable_path=EdgeChromiumDriverManager().install(),options=options)
+        #creamos el driver para firefox
+        self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(),options=options)
         self.imagenes = []
     
     def login(self):

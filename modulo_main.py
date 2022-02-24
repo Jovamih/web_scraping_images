@@ -7,6 +7,7 @@ import re,io, tempfile
 from PIL import Image
 
 
+
 def save_file(name,content):
     with open(name,mode="wb") as f:
         f.write(content)
@@ -23,6 +24,14 @@ def get_dominio(url):
     if match:
         return match.group(1)
     return None
+
+
+
+def parse_link(root_link,relative_link):
+    dominion=get_dominio(root_link)
+    full_link=relative_link if relative_link.startswith("http") or relative_link.startswith("https") else dominion+relative_link
+    full_name= full_link[full_link.rfind("/")+1:]
+    return (full_name,full_link)
 
 def imageweb_to_pil(url_image,scale=1.0):
     """
@@ -68,9 +77,7 @@ def web_scrapper(url_victima,path_dest="",filter=""):
             if image_relative is None: #si SRC existe pero esta vacio SRC="#"
                 continue
             else:
-                image_absolute= image_relative if image_relative.startswith("http") or image_relative.startswith("https") else dominio+image_relative
-                im_name=image_absolute[image_absolute.rfind("/")+1:]
-                list_resources.append((im_name,image_absolute))
+                list_resources.append(parse_link(url_victima,image_relative))
 
             """if image_relative.endswith(".png") or image_relative.endswith(".jpg"):
                 image_absolute= image_relative if image_relative.startswith("https") or  else  dominio+image_relative

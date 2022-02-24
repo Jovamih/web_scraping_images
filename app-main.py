@@ -10,8 +10,12 @@ if url_entry:
         resources=web_scrapper(url_entry)
         st.write("{0} Recursos multimedia disponibles".format(len(resources)))
         for name_img,url_img in resources:
-            img=imageweb_to_pil(url_img,scale=1.0)
-            st.image(img.convert("RGB"),caption=name_img)
+            try:
+                img=imageweb_to_pil(url_img,scale=1.0)
+                st.image(img.convert("RGB"),caption=name_img)
+            except Exception as e:
+                print("Error al procesar {0}".format(name_img))
+                #st.write(e)
     except Exception as e:
         st.write("Ups!. Hubo un error al procesar una imagen")
         print("Error interno :",e)

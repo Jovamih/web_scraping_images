@@ -57,12 +57,13 @@ def web_scrapper(url_victima,path_dest="",filter=""):
         soup=BeautifulSoup(content,"html.parser")
         
         coincidence_img=soup.find_all("img") #devuelve todas  las coincidencias img (etiquetas que poseen imagenes)
-        #print("{0} Imagenes detectadas.".format(len(coincidence_img)))
+        print("{0} Imagenes detectadas.".format(len(coincidence_img)))
         #filtramos aquellos que posean HREF
         coincidence_img=[x for x in coincidence_img if x.has_attr("src")]
         list_resources=[]
-        for tag_img in coincidence_img:
+        for i,tag_img in enumerate(coincidence_img):
             image_relative=tag_img.get("src")
+            print(i+1,":",image_relative)
             
             if image_relative is None: #si SRC existe pero esta vacio SRC="#"
                 continue

@@ -5,8 +5,20 @@ import time
 import sys 
 import re,io, tempfile
 from PIL import Image
+import os, zipfile,streamlit
 
-
+@streamlit.cache(persist=True)
+def compress_files(list_links):
+    with tempfile.SpooledTemporaryFile() as buffer:
+        with zipfile.ZipFile(buffer,"w",zipfile.ZIP_DEFLATED) as zip_file:
+            for i, link in enumerate(list_links):
+                response=requests.get(link,allow_redirects=True,verify=False,timeout=30,headers={"User-Agent":"Chrome/50.0.2661.94"}) #deshabilitamos la verificacion SSL
+                if response.status_code==200:
+                    #content_stream=io.BytesIO(response.content)
+                    zip_file.writestr(f"{i+1}.jpg",data=response.content)
+        buffer.seek(0)
+        return buffer.read()
+    return None
 
 def save_file(name,content):
     with open(name,mode="wb") as f:
@@ -39,16 +51,12 @@ def imageweb_to_pil(url_image,scale=1.0):
     return: Objeto PIL image
     """
     response=requests.get(url_image,stream=True)
-
-    with tempfile.SpooledTemporaryFile(max_size=1e9) as buffer:
-        #downloaded=0
-        #filesize=int(response.headers["content-length"])
-        for chunk in response.iter_content(chunk_size=1024):
-            buffer.write(chunk)
-        buffer.seek(0)
-        img=Image.open(io.BytesIO(buffer.read()))
-    return img.resize((int(img.size[0]*scale),int(img.size[1]*scale)))
+    if response.status_code==200:
+        return Image.open(io.BytesIO(response.content))
+    else:
+        raise Exception("Error al descargar la imagen")
     
+@streamlit.cache(persist=True)
 def web_scrapper(url_victima,path_dest="",filter=""):
     """
     url_victima: URL del sitio web para el raspado

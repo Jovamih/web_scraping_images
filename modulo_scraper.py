@@ -1,3 +1,4 @@
+from time import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -41,12 +42,17 @@ class ScrapperBot(object):
         pass
     def run(self):
         self.driver.get(self.url)
+        #self.driver.find_element_by_tag_name('body').send_keys(Keys.PAGE_DOWN)
+        #self.driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+        #self.driver.implicitly_wait(3)
+
         try:
             elements = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_all_elements_located((By.XPATH, "//img[@src]"))
             )
 
             links=[ element.get_attribute("src") for element in elements]
+            print(links)
             self.imagenes=[ parse_link(self.url,link) for link in links]
         except  NoSuchElementException:
             print("[*] SERVER:: No se encontraron elementos <Img>")
@@ -56,6 +62,8 @@ class ScrapperBot(object):
         
     
     def close(self):
+        self.driver.stop_client()
+        self.driver.close()
         self.driver.quit()
 
 if __name__=="__main__":
@@ -69,6 +77,7 @@ if __name__=="__main__":
         scrapper.run()
         print(scrapper.imagenes)
         scrapper.close()
+        del scrapper
     except Exception as e:
         print(e)
     
